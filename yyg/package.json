@@ -1,0 +1,8 @@
+{
+  "name": "yyg",
+  "version": "1.0.0",
+  "description": "简单对话应用",
+  "scripts": {
+    "build": "echo 'No build step required'"
+  }
+}
