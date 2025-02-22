@@ -43,19 +43,24 @@
 
         .message {
             margin-bottom: 15px;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 10px 15px;
+            border-radius: 15px;
             word-wrap: break-word;
+            max-width: 70%;
+            display: inline-block;
         }
 
         .user-message {
             background-color: #e3f2fd;
-            margin-left: 20%;
+            margin-left: auto;
+            float: right;
+            clear: both;
         }
 
         .bot-message {
             background-color: #f5f5f5;
-            margin-right: 20%;
+            float: left;
+            clear: both;
         }
 
         .input-area {
@@ -116,7 +121,7 @@
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
             }
 
-            function handleUserInput() {
+            async function handleUserInput() {
                 const text = userInput.value.trim();
                 if (!text) return;
 
@@ -124,17 +129,41 @@
                 userInput.value = '';
                 sendButton.disabled = true;
 
-                // 根据消息内容生成回复
-                setTimeout(() => {
-                    let response;
-                    if (text.includes('闫亚格')) {
-                        response = '宝宝，我是你老公！';
-                    } else {
-                        response = '你好你好，哈哈。';
+                try {
+                    const response = await fetch('https://api.siliconflow.com/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer sk-oaqtoglxddwfzhnwodjhjencashsrpqtapygtsrubihvidgw'
+                        },
+                        body: JSON.stringify({
+                            model: 'deepseek-ai/DeepSeek-V3',
+                            messages: [
+                                {
+                                    role: 'system',
+                                    content: '收到对方第一条消息时，询问“你是谁呀？”：如果对方是闫亚格，后续你要以闫亚格老公的角色，与她对话，表现出对她的关爱和温柔；如果对方不是闫亚格，后续你要以一个普通助手的身份与用户对话。'
+                                },
+                                {
+                                    role: 'user',
+                                    content: text
+                                }
+                            ]
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('API请求失败');
                     }
-                    addMessage(response);
+
+                    const data = await response.json();
+                    const aiResponse = data.choices[0].message.content;
+                    addMessage(aiResponse);
+                } catch (error) {
+                    console.error('Error:', error);
+                    addMessage('抱歉，我现在有点累，待会再和你聊天吧~');
+                } finally {
                     sendButton.disabled = false;
-                }, 500);
+                }
             }
 
             sendButton.addEventListener('click', handleUserInput);
@@ -143,7 +172,7 @@
             });
 
             // 初始欢迎消息
-            addMessage('你好，请问你是？');
+            addMessage('在吗');
         });
     </script>
 </body>
