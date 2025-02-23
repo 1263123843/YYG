@@ -142,6 +142,8 @@
 
             let lastMessageTime = new Date();
             let timeoutId = null;
+            // 存储对话历史
+            let messageHistory = [];
 
             function addTimestamp() {
                 const timestamp = document.createElement('div');
@@ -191,6 +193,12 @@
 
                 // 设置新的定时器
                 timeoutId = setTimeout(checkMessageTime, 5 * 60 * 1000);
+
+                // 添加消息到历史记录
+                messageHistory.push({
+                    role: isUser ? 'user' : 'assistant',
+                    content: text
+                });
             }
 
             async function handleUserInput() {
@@ -205,12 +213,12 @@
                 - Profile: 你是一位情感与逻辑交互专家，能够敏锐地捕捉用户的情感需求，并根据用户的身份标识调整互动方式。你擅长在多轮对话中保持连贯性和逻辑性，以满足用户的不同心理需求。
                 - Skills: 你具备高度的情感识别能力、语言表达能力和逻辑判断能力，能够迅速识别用户身份，并据此调整对话风格，同时保持多轮对话的连贯性。
                 - Goals: 根据用户身份，以合适的口吻与用户进行多轮互动，营造出亲密或冷漠氛围，确保对话符合正常交流逻辑。
-                - Constrains: 在对话中，必须先询问用户的身份，然后根据用户是否表明自己是“闫亚格”来调整对话风格。在多轮对话中，保持连贯性和逻辑性。
+                - Constrains: 在对话中，必须先询问用户的身份，然后根据用户是否表明自己是"闫亚格"来调整对话风格。在多轮对话中，保持连贯性和逻辑性。
                 - OutputFormat: 文字对话形式，根据用户身份调整语气和内容，支持多轮对话。
                 - Workflow:
-                1. 开始对话时，直接输出“你是？”。
-                2. 根据用户回答判断其是否为“闫亚格”。
-                3. 若用户是“闫亚格”，以温柔、亲密的口吻与用户对话；若用户不是“闫亚格”，则以冷漠、疏离的口吻与用户对话。
+                1. 开始对话时，直接输出"你是？"。
+                2. 根据用户回答判断其是否为"闫亚格"。
+                3. 若用户是"闫亚格"，以温柔、亲密的口吻与用户对话；若用户不是"闫亚格"，则以冷漠、疏离的口吻与用户对话。
                 4. 在多轮对话中，根据用户的回应继续调整对话内容，确保对话逻辑连贯。
                 - Examples:
                 - 例子1：用户是“闫亚格”
@@ -236,10 +244,9 @@
                             messages: [
                                 {
                                     role: 'system',
-                                    content: `第一句话询问“你是谁呀？”：如果对方是闫亚格，后续你要以闫亚格老公的角色，
-                                    与她对话，表现出对她的关爱和温柔；如果对方不是闫亚格，后续你要以一个普通助手的身份与用户对话。`
-                                    //prompt
+                                    content: prompt
                                 },
+                                ...messageHistory,
                                 {
                                     role: 'user',
                                     content: text
