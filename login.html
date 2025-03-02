@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YYG - 登录/注册</title>
+    <link rel="stylesheet" href="./assets/auth.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .login-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            padding: 30px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .login-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .login-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .login-tab.active {
+            color: #0078d4;
+            border-bottom: 2px solid #0078d4;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .form-group input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: #0078d4;
+            outline: none;
+        }
+
+        .form-error {
+            color: #f44336;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .login-button {
+            background-color: #0078d4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        .login-button:hover {
+            background-color: #0063b1;
+        }
+
+        .login-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .social-login {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .social-login p {
+            color: #666;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .social-login p::before,
+        .social-login p::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background-color: #eee;
+        }
+
+        .social-login p::before {
+            left: 0;
+        }
+
+        .social-login p::after {
+            right: 0;
+        }
+
+        .google-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            width: 100%;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .google-button:hover {
+            background-color: #f5f5f5;
+        }
+
+        .google-icon {
+            width: 18px;
+            height: 18px;
+        }
+
+        .switch-form {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .switch-form a {
+            color: #0078d4;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .switch-form a:hover {
+            text-decoration: underline;
+        }
+
+        .form-container {
+            display: none;
+        }
+
+        .form-container.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>Love YYG</h1>
+        </div>
+
+        <div class="login-tabs">
+            <div class="login-tab active" id="login-tab">登录</div>
+            <div class="login-tab" id="register-tab">注册</div>
+        </div>
+
+        <div class="form-container active" id="login-form-container">
+            <form class="login-form" id="login-form">
+                <div class="form-group">
+                    <label for="login-email">邮箱</label>
+                    <input type="email" id="login-email" required>
+                    <div class="form-error" id="login-email-error">请输入有效的邮箱地址</div>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">密码</label>
+                    <input type="password" id="login-password" required>
+                    <div class="form-error" id="login-password-error">密码不能为空</div>
+                </div>
+                <button type="submit" class="login-button" id="login-submit">登录</button>
+            </form>
+
+            <div class="social-login">
+                <p>或</p>
+                <button class="google-button" id="google-login">
+                    <svg class="google-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                    </svg>
+                    使用 Google 账号登录
+                </button>
+            </div>
+
+            <div class="switch-form">
+                <span>还没有账号？</span>
+                <a id="switch-to-register">立即注册</a>
+            </div>
+        </div>
+
+        <div class="form-container" id="register-form-container">
+            <form class="login-form" id="register-form">
+                <div class="form-group">
+                    <label for="register-email">邮箱</label>
+                    <input type="email" id="register-email" required>
+                    <div class="form-error" id="register-email-error">请输入有效的邮箱地址</div>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">密码</label>
+                    <input type="password" id="register-password" required>
+                    <div class="form-error" id="register-password-error">密码长度至少为6位</div>
+                </div>
+                <div class="form-group">
+                    <label for="register-confirm-password">确认密码</label>
+                    <input type="password" id="register-confirm-password" required>
+                    <div class="form-error" id="register-confirm-password-error">两次输入的密码不一致</div>
+                </div>
+                <button type="submit" class="login-button" id="register-submit">注册</button>
+            </form>
+
+            <div class="social-login">
+                <p>或</p>
+                <button class="google-button" id="google-register">
+                    <svg class="google-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                    </svg>
+                    使用 Google 账号注册
+                </button>
+            </div>
+
+            <div class="switch-form">
+                <span>已有账号？</span>
+                <a id="switch-to-login">立即登录</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBdKmgdO_engVTyDJVPkPQxZPSJ8eIX3Ac",
+            authDomain: "yyg1995-69af1.firebaseapp.com",
+            projectId: "yyg1995-69af1",
+            storageBucket: "yyg1995-69af1.firebasestorage.app",
+            messagingSenderId: "593652360428",
+            appId: "1:593652360428:web:7ec9c4c68f06b8365d31c9",
+            measurementId: "G-K8XVZFNJMH"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        // DOM Elements
+        const loginTab = document.getElementById('login-tab');
+        const registerTab = document.getElementById('register-tab');
+        const loginFormContainer = document.getElementById('login-form-container');
+        const registerFormContainer = document.getElementById('register-form-container');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const switchToRegister = document.getElementById('switch-to-register');
+        const switchToLogin = document.getElementById('switch-to-login');
+        const googleLoginButton = document.getElementById('google-login');
+        const googleRegisterButton = document.getElementById('google-register');
+
+        // 切换登录/注册表单
+        loginTab.addEventListener('click', () => {
+            loginTab.classList.add('active');
+            registerTab.classList.remove('active');
+            loginFormContainer.classList.add('active');
+            registerFormContainer.classList.remove('active');
+        });
+
+        registerTab.addEventListener('click', () => {
+            registerTab.classList.add('active');
+            loginTab.classList.remove('active');
+            registerFormContainer.classList.add('active');
+            loginFormContainer.classList.remove('active');
+        });
+
+        switchToRegister.addEventListener('click', () => {
+            registerTab.click();
+        });
+
+        switchToLogin.addEventListener('click', () => {
+            loginTab.click();
+        });
+
+        // 表单验证函数
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function validatePassword(password) {
+            return password.length >= 6;
+        }
+
+        function showError(element, message) {
+            element.textContent = message;
+            element.style.display = 'block';
+        }
+
+        function hideError(element) {
+            element.style.display = 'none';
+        }
+
+        // 登录表单提交
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const emailError = document.getElementById('login-email-error');
+            const passwordError = document.getElementById('login-password-error');
+            let hasError = false;
+            
+            // 验证邮箱
+            if (!validateEmail(email)) {
+                showError(emailError, '请输入有效的邮箱地址');
+                hasError = true;
+            } else {
+                hideError(emailError);
+            }
+            
+            // 验证密码
+            if (!password) {
+                showError(passwordError, '密码不能为空');
+                hasError = true;
+            } else {
+                hideError(passwordError);
+            }
+            
+            if (hasError) return;
+            
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                console.log('登录成功:', user);
+                
+                // 存储用户信息到本地存储
+                localStorage.setItem('user', JSON.stringify({
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName || email.split('@')[0]
+                }));
+                
+                // 跳转到聊天页面
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('登录失败:', error);
+                alert('登录失败: ' + error.message);
+            }
+        });
+
+        // 注册表单提交
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm-password').value;
+            const emailError = document.getElementById('register-email-error');
+            const passwordError = document.getElementById('register-password-error');
+            const confirmPasswordError = document.getElementById('register-confirm-password-error');
+            let hasError = false;
+            
+            // 验证邮箱
+            if (!validateEmail(email)) {
+                showError(emailError, '请输入有效的邮箱地址');
+                hasError = true;
+            } else {
+                hideError(emailError);
+            }
+            
+            // 验证密码
+            if (!validatePassword(password)) {
+                showError(passwordError, '密码长度至少为6位');
+                hasError = true;
+            } else {
+                hideError(passwordError);
+            }
+            
+            // 验证确认密码
+            if (password !== confirmPassword) {
+                showError(confirmPasswordError, '两次输入的密码不一致');
+                hasError = true;
+            } else {
+                hideError(confirmPasswordError);
+            }
+            
+            if (hasError) return;
+            
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                console.log('注册成功:', user);
+                
+                // 存储用户信息到本地存储
+                localStorage.setItem('user', JSON.stringify({
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName || email.split('@')[0]
+                }));
+                
+                // 跳转到聊天页面
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('注册失败:', error);
+                alert('注册失败: ' + error.message);
+            }
+        });
+
+        // Google 登录
+        googleLoginButton.addEventListener('click', async () => {
+            try {
+                const result = await signInWithPopup(auth, googleProvider);
+                const user = result.user;
+                console.log('Google登录成功:', user);
+                
+                // 存储用户信息到本地存储
+                localStorage.setItem('user', JSON.stringify({
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName || user.email.split('@')[0],
+                    photoURL: user.photoURL
+                }));
+                
+                // 跳转到聊天页面
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Google登录失败:', error);
+                alert('Google登录失败: ' + error.message);
+            }
+        });
+
+        // Google 注册
+        googleRegisterButton.addEventListener('click', async () => {
+            try {
+                const result = await signInWithPopup(auth, googleProvider);
+                const user = result.user;
+                console.log('Google注册成功:', user);
+                
+                // 存储用户信息到本地存储
+                localStorage.setItem('user', JSON.stringify({
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName || user.email.split('@')[0],
+                    photoURL: user.photoURL
+                }));
+                
+                // 跳转到聊天页面
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Google注册失败:', error);
+                alert('Google注册失败: ' + error.message);
+            }
+        });
+
+        // 检查用户是否已登录
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // 用户已登录，跳转到聊天页面
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>
