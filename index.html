@@ -233,26 +233,29 @@
                     你：“说吧，我看看能不能帮到你。”`
 
                 try {
+                    const requestBody = {
+                        model: 'deepseek-ai/DeepSeek-V3',
+                        messages: [
+                            {
+                                role: 'system',
+                                content: prompt
+                            },
+                            ...messageHistory,
+                            {
+                                role: 'user',
+                                content: text
+                            }
+                        ]
+                    };
+                    console.log('API请求消息:', requestBody.messages);
+
                     const response = await fetch('https://api.siliconflow.com/v1/chat/completions', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                             'Authorization': 'Bearer sk-imwirhobgvciiakqvikibdaclpddhrthvbsxeoqcnhdfveiq'
                         },
-                        body: JSON.stringify({
-                            model: 'deepseek-ai/DeepSeek-V3',
-                            messages: [
-                                {
-                                    role: 'system',
-                                    content: prompt
-                                },
-                                ...messageHistory,
-                                {
-                                    role: 'user',
-                                    content: text
-                                }
-                            ]
-                        })
+                        body: JSON.stringify(requestBody)
                     });
 
                     if (!response.ok) {
@@ -260,6 +263,8 @@
                     }
 
                     const data = await response.json();
+                    console.log('API响应消息:', data.choices[0].message.content);
+
                     const aiResponse = data.choices[0].message.content;
                     addMessage(aiResponse);
                 } catch (error) {
